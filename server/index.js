@@ -3,8 +3,10 @@ import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
 import {Admin, Cart, FoodItem, Orders, Restaurant, User } from './Schema.js'
 
+dotenv.config({path:"./.env"})
 
 const app = express();
 
@@ -15,10 +17,18 @@ app.use(cors());
 
 const PORT = 6001;
 
-mongoose.connect('mongodb://localhost:27017/foodDelivery',{
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}).then(()=>{
+const MongoUri  = process.env.DRIVER_LINK;
+const connectToMongo = async() => {
+    try {
+        await mongoose.connect(MongoUri);
+        console.log('Connection Sucessful')
+    }
+    catch(error) {
+        console.log(error.message);
+    }
+}
+
+connectToMongo()
 
     app.post('/register', async (req, res) => {
         const { username, email, usertype, password , restaurantAddress, restaurantImage} = req.body;
@@ -468,4 +478,3 @@ mongoose.connect('mongodb://localhost:27017/foodDelivery',{
     app.listen(PORT, ()=>{
         console.log('running @ 6001');
     })
-}).catch((e)=> console.log(`Error in db connection ${e}`));
